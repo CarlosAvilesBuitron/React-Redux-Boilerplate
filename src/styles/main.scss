@@ -297,6 +297,8 @@ select {
 }
 
 
+
+
 /* CSS Below */
 
 
@@ -1113,6 +1115,10 @@ div.amount-button {
 @media (max-width: 768px) {
     .gift-type img {
         width: auto;
+    }
+    
+    #mainButtons{
+    text-align:center;
     }
 }
 

@@ -39,29 +39,31 @@ class CustomAmount extends React.Component{
                    if(cookie.load('customAmount') >= this.props.minAmount){
                        this.props.premiumHide({display : 'block'});
                        this.props.premiumUpdate({display: 'none'});
-                       
-                       setTimeout(() => {
-                           
-                           for(let i = 0; i < giftLevels.length; i++){
+                       if(MainFunctions.urlParam('PRE') && MainFunctions.urlParam('LEVELS') || cookie.load('PRE') && cookie.load('LEVELS')){
+                               setTimeout(() => {
                                
-                               premiumLoop = document.getElementById(giftLevels[i]).parentElement.parentElement;
-                               premiumLoop.style.display ="none";
-                               let foundAmount = parseFloat(cookie.load('customAmount'));
-                               
-                               if(foundAmount >= newLevels[i]){
-                                   console.log(newLevels[i]);
-                                   premiumLoop.style.display ="block";
-                               } else {
-                                    console.log('Level not met');
-                                    if(document.getElementById('Backend_Premium_Code').value == giftLevels[i]){
-                                       document.getElementById('NONE').click();
+                               for(let i = 0; i < giftLevels.length; i++){
+                                   
+                                   premiumLoop = document.getElementById(giftLevels[i]).parentElement.parentElement;
+                                   premiumLoop.style.display ="none";
+                                   let foundAmount = parseFloat(cookie.load('customAmount'));
+                                   
+                                   if(foundAmount >= newLevels[i]){
+                                       console.log(newLevels[i]);
+                                       premiumLoop.style.display ="block";
+                                   } else {
+                                        console.log('Level not met');
+                                        if(document.getElementById('Backend_Premium_Code').value == giftLevels[i]){
+                                           document.getElementById('NONE').click();
+                                        }
                                     }
-                                }
+                                   
+                               }
                                
-                           }
+                           }, 800);
                            
-                       }, 800);
-                       
+                           
+                       }
                      
                    } 
                   
@@ -113,7 +115,7 @@ class CustomAmount extends React.Component{
     
     _newLevel(customEntered){
         
- 
+       if(MainFunctions.urlParam('PRE') && MainFunctions.urlParam('LEVELS') || cookie.load('PRE') && cookie.load('LEVELS')){
            for(let i = 0; i < giftLevels.length; i++){
     
                 var premiumReady = document.getElementById(giftLevels[i]).parentElement.parentElement;
@@ -132,7 +134,7 @@ class CustomAmount extends React.Component{
                 }
             }
            
-      
+       }
         
     }
     

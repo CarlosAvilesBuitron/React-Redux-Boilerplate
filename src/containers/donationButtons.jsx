@@ -36,27 +36,7 @@ class DonationButtons extends React.Component{
     
     componentDidMount(){
         
-        if(!cookie.load('buttonAmount') && !cookie.load('customAmount')){
-            if(MainFunctions.urlParam('CHOSEN')){
-                
-                let chosenPass = MainFunctions.urlParam('CHOSEN');
-                
-                if(document.getElementById(chosenPass)){
-                    document.getElementById(chosenPass).click();
-                } else {
-                   document.getElementById('custom-amount').value = parseFloat(chosenPass);
-                   document.getElementById('OTHER').click();
-                   this.props.showCustom({display: 'block'});
-                   this.props.donationADD(parseFloat(chosenPass));
-                   
-                   if(parseFloat(chosenPass) > this.props.minAmount){
-                       this.props.premiumHide({display : 'block'});
-                       this.props.premiumUpdate({display: 'none'});
-                   }
-                }
-                
-            }
-        }
+        
         
         
         if(!MainFunctions.urlParam('COOKIES')){
@@ -125,22 +105,71 @@ class DonationButtons extends React.Component{
                 
             }
             
+
             
-            if(MainFunctions.urlParam('TEXT')){
-                textString = MainFunctions.urlParam('TEXT').replace(/%20/g, ' ');
+                if(!cookie.load('buttonAmount') && !cookie.load('customAmount')){
+                    if(MainFunctions.urlParam('CHOSEN')){
+                        
+                        setTimeout(()=>{
+                            
+                            let chosenPass = MainFunctions.urlParam('CHOSEN');
+                        
+                            if(document.getElementById(chosenPass)){
+                                document.getElementById(chosenPass).click();
+                             } else {
+                               document.getElementById('custom-amount').value = parseFloat(chosenPass);
+                               document.getElementById('OTHER').click();
+                               this.props.showCustom({display: 'block'});
+                               this.props.donationADD(parseFloat(chosenPass));
+                               
+                               if(parseFloat(chosenPass) > this.props.minAmount){
+                                   this.props.premiumHide({display : 'block'});
+                                   this.props.premiumUpdate({display: 'none'});
+                               }
+                            }
+                            
+                            
+                        },300);
+                        
+                        
+                    }
+            }
+            
+            
+            if(cookie.load('buttonAmount') && cookie.load('buttonAmount') != 0){
+                
+               var previousButton = String(cookie.load('buttonAmount'));
+               
+                setTimeout(()=>{document.getElementById(previousButton).click();},300);
+                
+               
+               this.props.donationADD(cookie.load('buttonAmount'));
+               
+               if(cookie.load('buttonAmount') > this.props.minAmount){
+                   this.props.premiumHide({display : 'block'});
+                   this.props.premiumUpdate({display: 'none'});
+               }
+           }
+           
+           setTimeout(()=>{
+           if(MainFunctions.urlParam('TEXT')){
+                textString = MainFunctions.urlParam('TEXT').replace(/%20/g, ' ').replace(/\+/g, ' ').replace(/%2C/g, ',');
                 cookie.save('textString', textString, { path: '/' , maxAge: 3600 * 4  });
                 let minButton = document.getElementById(currentMin);
-                if(minButton){
-                    console.log('found it');
-                    minButton.style.width = '180px';
-                    minButton.innerHTML = '<h4 style="margin-top:4px; padding-top:5px">$' + currentMin + '</h4>' + '<span style="line-height:18px; padding: 0 10px;">' + textString + '</span>';
-                    this.setState({
-                        buttonText : {width : '100px' , height: '80px'}
-                    });
-                    this.setState({
-                        h4Margin : {marginTop : '26px'}
-                    });
-                }
+                
+                    
+                    if(minButton){
+                        console.log('found it');
+                        minButton.style.width = '180px';
+                        minButton.innerHTML = '<h4 style="margin-top:4px; padding-top:5px">$' + currentMin + '</h4>' + '<span style="line-height:18px; padding: 0 10px;">' + textString + '</span>';
+                        this.setState({
+                            buttonText : {width : '100px' , height: '80px'}
+                        });
+                        this.setState({
+                            h4Margin : {marginTop : '26px'}
+                        });
+                    }
+                
             } else if(cookie.load('textString')){
                 textString = cookie.load('textString');
                 let minButton = document.getElementById(currentMin);
@@ -156,27 +185,7 @@ class DonationButtons extends React.Component{
                     });
                 }
             }
-            
-            
-            
-            
-            if(cookie.load('buttonAmount') && cookie.load('buttonAmount') != 0){
-                
-               var previousButton = String(cookie.load('buttonAmount'));
-               
-               setTimeout(function(){
-                   document.getElementById(previousButton).click();
-               }, 300);
-               
-               
-               
-               this.props.donationADD(cookie.load('buttonAmount'));
-               
-               if(cookie.load('buttonAmount') > this.props.minAmount){
-                   this.props.premiumHide({display : 'block'});
-                   this.props.premiumUpdate({display: 'none'});
-               }
-           }
+           },300);
             
         } else {
             cookie.remove('donationArray', { path: '/' });
@@ -245,27 +254,31 @@ class DonationButtons extends React.Component{
     
     _newLevel(customEntered){
        console.log(giftLevels);
-       
-       setTimeout(function(){
-                   for(let i = 0; i < giftLevels.length; i++){
+       if(MainFunctions.urlParam('PRE') && MainFunctions.urlParam('LEVELS') || cookie.load('PRE') && cookie.load('LEVELS')){
+           
+           setTimeout(function(){
+                       for(let i = 0; i < giftLevels.length; i++){
+                
+                        var premiumReady = document.getElementById(giftLevels[i]).parentElement.parentElement;
+                        
+                        if(premiumReady){
+                            premiumReady.style.display ="none";
             
-                    var premiumReady = document.getElementById(giftLevels[i]).parentElement.parentElement;
-                    
-                    if(premiumReady){
-                        premiumReady.style.display ="none";
-        
-                        if (customEntered >= newLevels[i]) {
-                            premiumReady.style.display ="block";
-                        } else {
-                            console.log('Level not met');
-                            if(document.getElementById('Backend_Premium_Code').value == giftLevels[i]){
-                                document.getElementById('NONE').click();
+                            if (customEntered >= newLevels[i]) {
+                                premiumReady.style.display ="block";
+                            } else {
+                                console.log('Level not met');
+                                if(document.getElementById('Backend_Premium_Code').value == giftLevels[i]){
+                                    document.getElementById('NONE').click();
+                                }
                             }
                         }
                     }
-                }
+               
+           }, 300);
            
-       }, 300);
+       }
+           
       
         
     }
@@ -282,7 +295,7 @@ class DonationButtons extends React.Component{
         });
 
         return (
-            <div>
+            <div id="mainButtons">
                 {donationNodes}
                 <div className="amount-holder">
                     <div className="amount-button custom-premium-level" id="OTHER" onClick={this._onClickCustom.bind(this)} style={this.state.buttonText}>
